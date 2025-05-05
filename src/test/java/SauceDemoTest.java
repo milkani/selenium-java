@@ -1,25 +1,48 @@
+import lv.acodemy.page_object.CartPage;
+import lv.acodemy.page_object.HeaderPage;
 import lv.acodemy.page_object.InventoryPage;
 import lv.acodemy.page_object.LoginPage;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SauceDemoTest {
 
     ChromeDriver driver;
+    ChromeOptions options;
+
     LoginPage loginPage;
     InventoryPage inventoryPage;
+    HeaderPage headerPage;
+    CartPage cartPage;
 
     @BeforeMethod
     public void beforeTest() {
-        driver = new ChromeDriver();
+        options = new ChromeOptions();
+
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("credentials_enable_service", false);
+        prefs.put("profile.password_manager_enabled", false);
+
+         options.setExperimentalOption("prefs", prefs);
+
+        options.addArguments("--incognito");
+        options.addArguments("--start-maximized");
+
+        driver = new ChromeDriver(options);
         driver.get("https://saucedemo.com");
 
         loginPage = new LoginPage(driver);
         inventoryPage = new InventoryPage(driver);
+        headerPage = new HeaderPage(driver);
+        cartPage = new CartPage(driver);
     }
 
     @Test
@@ -45,6 +68,15 @@ public class SauceDemoTest {
     public void addItemToTheCart() {
         loginPage.authorize("standard_user", "secret_sauce");
         inventoryPage.addItemToCartByName("Onesie");
+        Assertions.assertThat(headerPage.getCartBadgeText()).isEqualTo("1");
+
+        headerPage.getShoppingCartLink().click();
+        Assertions.assertThat(cartPage.getCartItems().size()).isEqualTo(1);
+
+        cartPage.getCheckoutButton().click();
+
+        System.out.println("123");
+
     }
 
     @AfterMethod()
