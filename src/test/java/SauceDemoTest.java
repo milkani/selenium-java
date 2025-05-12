@@ -72,7 +72,7 @@ public class SauceDemoTest {
     @Severity(SeverityLevel.MINOR)
     @Description("Verify that item was added to the cart")
     public void addItemToTheCart() throws Exception {
-        VideoRecorderUtil.startRecording("addItemToTheCart");
+//        VideoRecorderUtil.startRecording("addItemToTheCart");
         Allure.step("User is trying to authorize");
         loginPage.authorize("standard_user", "secret_sauce");
 
@@ -109,9 +109,9 @@ public class SauceDemoTest {
         assertThat(checkoutPage.getCompleteOrderText().getText())
                 .isEqualTo(Constants.Messages.ORDER_HAS_BEEN_DISPATCHED);
 
-        String recordedFilePath = VideoRecorderUtil.stopRecording();
-        InputStream videoStream = Files.newInputStream(Path.of(recordedFilePath));
-        Allure.addAttachment("Test Video", "video/mp4", videoStream, ".avi");
+//        String recordedFilePath = VideoRecorderUtil.stopRecording();
+//        InputStream videoStream = Files.newInputStream(Path.of(recordedFilePath));
+//        Allure.addAttachment("Test Video", "video/mp4", videoStream, ".avi");
     }
 
     @AfterMethod()
