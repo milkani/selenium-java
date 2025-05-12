@@ -1,23 +1,39 @@
 import com.github.javafaker.Faker;
+import io.qameta.allure.*;
+import io.qameta.allure.testng.AllureTestNg;
 import lv.acodemy.page_object.*;
-import org.assertj.core.api.Assertions;
-import org.openqa.selenium.By;
+import lv.acodemy.utils.AllureAttachments;
+import lv.acodemy.utils.Constants;
+import lv.acodemy.utils.VideoRecorderUtil;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Epic("Sauce Demo Test")
+@Feature(value = "Add item to the cart")
+@Listeners(AllureTestNg.class)
 public class SauceDemoTest {
 
     ChromeDriver driver;
+    WebDriverWait wait;
     ChromeOptions options;
 
     LoginPage loginPage;
@@ -38,13 +54,13 @@ public class SauceDemoTest {
         prefs.put("credentials_enable_service", false);
         prefs.put("profile.password_manager_enabled", false);
 
-         options.setExperimentalOption("prefs", prefs);
-
+        options.setExperimentalOption("prefs", prefs);
         options.addArguments("--incognito");
         options.addArguments("--start-maximized");
-        options.addArguments("--headless");
 
         driver = new ChromeDriver(options);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
         driver.get("https://saucedemo.com");
 
         loginPage = new LoginPage(driver);
@@ -54,55 +70,51 @@ public class SauceDemoTest {
         checkoutPage = new CheckoutPage(driver);
     }
 
-    @Test(enabled = false)
-    public void verifyLoggedInTest() {
-        loginPage.authorize("standard_user", "secret_sauce");
-
-        String productsText = driver.findElement(By.className("title")).getText();
-        assertThat(productsText)
-                .withFailMessage("Are u lalka? Expected title to be 'Products' but was '%s'", productsText)
-                .isNotNull()
-                .isNotEmpty()
-                .startsWith("Prod")
-                .endsWith("ucts")
-                .isEqualTo("Products");
-    }
-
-    @Test(enabled = false)
-    public void logInTest() {
-        loginPage.authorize("standard_user", "secret_sauce");
-    }
-
     @Test(testName = "Add item to the cart")
-    public void addItemToTheCart() {
-        logger.info("Scenario: Add item to the cart");
-
-        logger.info("Step 1: User is trying to authorize");
+    @Severity(SeverityLevel.MINOR)
+    @Description("Verify that item was added to the cart")
+    public void addItemToTheCart() throws Exception {
+        VideoRecorderUtil.startRecording("addItemToTheCart");
+        Allure.step("User is trying to authorize");
         loginPage.authorize("standard_user", "secret_sauce");
-        logger.info("User is authorized");
 
-        logger.info("Step 2: Adding item to the cart");
+        Allure.step("Add item to the cart by name");
         inventoryPage.addItemToCartByName("Onesie");
-        logger.info("Item added to the cart");
 
-        logger.info("Step 3: Checking if item was added to the cart");
+        Allure.step("Check cart badge");
         assertThat(headerPage.getCartBadgeText()).isEqualTo("1");
-        logger.info("Item was added to the cart");
 
+        Allure.step("Click on shopping cart link");
         headerPage.getShoppingCartLink().click();
         assertThat(cartPage.getCartItems().size()).isEqualTo(1);
 
+        Allure.step("Click on checkout button");
+        wait.until(ExpectedConditions.elementToBeClickable(cartPage.getCheckoutButton()));
         cartPage.getCheckoutButton().click();
 
         String firstName = data.name().firstName();
         String lastName = data.name().lastName();
         String postalCode = data.address().zipCode();
 
-        logger.debug("First name: {}, last name: {}, postal code: {}", firstName, lastName, postalCode);
+        Allure.step("Fill checkout form");
         checkoutPage.fillCheckoutForm(
                 firstName,
                 lastName,
                 postalCode);
+
+        Allure.step("Complete purchase");
+        checkoutPage.completePurchase();
+
+        Allure.step("Verify that order was completed");
+        assertThat(checkoutPage.getCompleteOrderHeader().getText())
+                .isEqualTo(Constants.Messages.THANK_YOU_FOR_YOUR_ORDER);
+        assertThat(checkoutPage.getCompleteOrderText().getText())
+                .isEqualTo(Constants.Messages.ORDER_HAS_BEEN_DISPATCHED);
+
+        String recordedFilePath = VideoRecorderUtil.stopRecording();
+        InputStream videoStream = Files.newInputStream(Path.of(recordedFilePath));
+        Allure.addAttachment("Test Video", "video/mp4", videoStream, ".avi");
+
 
     }
 
