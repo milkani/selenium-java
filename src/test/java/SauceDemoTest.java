@@ -2,7 +2,6 @@ import com.github.javafaker.Faker;
 import io.qameta.allure.*;
 import io.qameta.allure.testng.AllureTestNg;
 import lv.acodemy.page_object.*;
-import lv.acodemy.utils.AllureAttachments;
 import lv.acodemy.utils.Constants;
 import lv.acodemy.utils.VideoRecorderUtil;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -16,11 +15,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +54,7 @@ public class SauceDemoTest {
         options.setExperimentalOption("prefs", prefs);
         options.addArguments("--incognito");
         options.addArguments("--start-maximized");
-        options.addArguments("--headless");
+        options.addArguments("--headless=new");
 
         driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
