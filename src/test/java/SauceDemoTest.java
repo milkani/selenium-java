@@ -57,6 +57,7 @@ public class SauceDemoTest {
         options.setExperimentalOption("prefs", prefs);
         options.addArguments("--incognito");
         options.addArguments("--start-maximized");
+        options.addArguments("--headless");
 
         driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -114,8 +115,6 @@ public class SauceDemoTest {
         String recordedFilePath = VideoRecorderUtil.stopRecording();
         InputStream videoStream = Files.newInputStream(Path.of(recordedFilePath));
         Allure.addAttachment("Test Video", "video/mp4", videoStream, ".avi");
-
-
     }
 
     @AfterMethod()
