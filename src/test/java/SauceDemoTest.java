@@ -3,7 +3,6 @@ import io.qameta.allure.*;
 import io.qameta.allure.testng.AllureTestNg;
 import lv.acodemy.page_object.*;
 import lv.acodemy.utils.Constants;
-import lv.acodemy.utils.VideoRecorderUtil;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -15,9 +14,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -112,6 +108,21 @@ public class SauceDemoTest {
 //        String recordedFilePath = VideoRecorderUtil.stopRecording();
 //        InputStream videoStream = Files.newInputStream(Path.of(recordedFilePath));
 //        Allure.addAttachment("Test Video", "video/mp4", videoStream, ".avi");
+    }
+
+    @Test
+    public void loginEmptyCredentialTest() {
+
+    }
+
+    @Test
+    public void loginEmptyUserNameTest() {
+
+    }
+
+    @Test
+    public void loginEmptyPasswordTest() {
+
     }
 
     @AfterMethod()

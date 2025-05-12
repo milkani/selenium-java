@@ -45,6 +45,11 @@ jobs:
             |
             allure generate target/allure-results --clean -o target/allure-report
 
+      - name: Debug allure-results contents
+        run: |
+              echo "Contents of target/allure-results:"
+              ls -l target/allure-results || echo "Directory does not exist"
+
       - name: Upload allure report
         uses: actions/upload-artifact@v4
         with:
